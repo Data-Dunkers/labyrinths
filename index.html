@@ -11,126 +11,101 @@
             padding: 20px;
             text-align: center;
         }
-        h1 {
-            margin-bottom: 20px;
-            font-size: small;
-        }
-        #question, #options, #code {
+        #question {
             margin-bottom: 20px;
         }
-        #options {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        #code {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: left;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        #code_output {
+            margin-bottom: 20px;
+            display: none;
+        }
+        #answerInput {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
         }
         button {
-            margin: 2px;
-            padding: 2px;
-            min-width: 200px;
+            padding: 10px;
+            min-width: 100px;
         }
-        #result, #code-output {
+        #result {
             font-weight: bold;
             margin-top: 20px;
         }
-        #code-input {
-            width: 100%;
-            height: 100px;
-            margin-bottom: 10px;
-        }
-        #run-code {
-            margin-bottom: 10px;
-        }
     </style>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.0/full/pyodide.js"></script>
 </head>
 <body>
     <h1>Basketball Data Labyrinth</h1>
-    <div id="question-container">
+    <div id="quiz-container">
         <div id="question"></div>
-        <div id="code">
-            <textarea id="code-input" placeholder="Write Python code here to help you answer"></textarea>
-            <button id="run-code">▶</button>
-            <pre id="code-output"></pre>
-        </div>
-        <div id="options"></div>
+        <div id="code"></div>
+        <button onclick="toggleCodeOutput()">▶</button>
+        <div id="code_output"></div>
+        <input type="text" id="answerInput" placeholder="Type your answer here">
+        <button onclick="checkAnswer()">Submit</button>
         <div id="result"></div>
     </div>
 
     <script>
-        let pyodide = null;
-
-        async function initPyodide() {
-            pyodide = await loadPyodide();
-        }
-
-        async function runCode() {
-            if (!pyodide) await initPyodide();
-            
-            const codeInput = document.getElementById('code-input');
-            const codeOutput = document.getElementById('code-output');
-            
-            try {
-                const output = pyodide.runPython(codeInput.value);
-                codeOutput.textContent = output ? output.toString() : "";
-                codeOutput.style.color = "green";
-            } catch (err) {
-                codeOutput.textContent = `Error: ${err}`;
-                codeOutput.style.color = "red";
-            }
-        }
-
         const questions = [
             {
-                text: "Who is the NBA's all-time leading scorer?",
-                code: "# Hint: You can use variables and string comparisons",
-                options: ["LeBron James", "Michael Jordan", "Kareem Abdul-Jabbar", "Kobe Bryant"],
-                correct: "LeBron James"
-            },
-            {
                 text: "How many championships did Michael Jordan win?",
-                code: "# Hint: You can do simple calculations here",
-                options: ["4", "5", "6", "7"],
-                correct: "6"
+                correct: "6",
+                code: "print(3 + 3)",
+                code_output: "6"
             },
             {
                 text: "In what year was the NBA founded?",
-                code: "# Hint: You can compare or calculate years",
-                options: ["1946", "1950", "1952", "1960"],
-                correct: "1946"
+                correct: "1946",
+                code: "", 
+                code_output: " "
             }
         ];
 
         let currentQuestionIndex = 0;
 
         function displayQuestion() {
-            const questionObj = questions[currentQuestionIndex];
-            document.getElementById('question').textContent = questionObj.text;
-            document.getElementById('code-input').value = questionObj.code;
-            document.getElementById('code-output').textContent = '';
-            
-            const optionsContainer = document.getElementById('options');
-            optionsContainer.innerHTML = '';
-            
-            questionObj.options.forEach(option => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.onclick = () => checkAnswer(option);
-                optionsContainer.appendChild(button);
-            });
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById('question').textContent = currentQuestion.text;
+            document.getElementById('code').textContent = currentQuestion.code;
+            document.getElementById('code_output').innerHTML = currentQuestion.code_output;
+            document.getElementById('answerInput').value = "";
+            document.getElementById('code_output').style.display = "none";
         }
 
-        function checkAnswer(selectedOption) {
+        function toggleCodeOutput() {
+            const codeOutputDiv = document.getElementById('code_output');
+            if (codeOutputDiv.style.display === "none") {
+                codeOutputDiv.style.display = "block";
+            } else {
+                codeOutputDiv.style.display = "none";
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value.trim();
             const resultDiv = document.getElementById('result');
             const currentQuestion = questions[currentQuestionIndex];
 
-            if (selectedOption === currentQuestion.correct) {
+            if (userAnswer.toLowerCase() === currentQuestion.correct.toLowerCase()) {
                 resultDiv.textContent = "Correct!";
                 resultDiv.style.color = "green";
                 
                 currentQuestionIndex++;
                 
                 if (currentQuestionIndex < questions.length) {
-                    setTimeout(displayQuestion, 1000);
+                    setTimeout(() => {
+                        resultDiv.textContent = "";
+                        displayQuestion();
+                    }, 1000);
                 } else {
                     resultDiv.textContent = "Congratulations! You completed the Basketball Data Labyrinth!";
                 }
@@ -140,11 +115,8 @@
             }
         }
 
-        // Add event listener to run code button
-        document.getElementById('run-code').addEventListener('click', runCode);
-
-        // Initialize Pyodide and start the quiz
-        initPyodide().then(displayQuestion);
+        // Start the quiz
+        displayQuestion();
     </script>
 </body>
 </html>
