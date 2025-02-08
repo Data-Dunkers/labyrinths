@@ -115,6 +115,11 @@
             }
         }
 
+        // Prevent right-click context menu
+        document.addEventListener('contextmenu', event => {
+            event.preventDefault();
+        });
+
         // Start the quiz
         displayQuestion();
     </script>
