@@ -6,8 +6,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
+            /*max-width: 600px;*/
+            margin: 5 auto;
             padding: 20px;
             text-align: center;
         }
@@ -30,7 +30,7 @@
         }
         #answerInput {
             padding: 10px;
-            width: 80%;
+            width: 480px;
             margin-bottom: 10px;
         }
         button {
@@ -50,34 +50,22 @@
     <h1>Basketball Data Labyrinth</h1>
     <div id="quiz-container">
         <div id="question"></div>
+        <div id="answerChoices" style="text-align: left; padding-left: 20%;"></div>
+        <br>
         <input type="text" id="answerInput" placeholder="Type your answer here">
-        <div id="answerChoices" style="text-align: left;"></div>
         <br>
         <button onclick="checkAnswer()">Submit</button>
         <div id="result"></div>
-        <div id="code" class="language-python"></div>
+        <div id="code" style="display: none;" class="language-python"></div>
         <button onclick="displayCodeOutput()" id="codePlayButton" style="display: none;">▶</button>
         <br>
         <div id="code_output"></div>
-        <div id="data_output"></div>
-        <br>
-        <div id="visualization" style="display: none;"><iframe src="visualization1.html" height="500" width="100%"></iframe></div>
         <hr>
         <div style="text-align: right;"><button onclick="previousQuestion()" id="backButton" style="display: none;">Previous Question</button></div>
     </div>
 
     <script>
         const questions = [
-            {
-                type: "multiple choice",
-                text: "Let's create a visualization of points versus minutes played per game. What is the trend you see in the data?",
-                choices: ["A. players with more minutes generally got more points ", "B. players with more minutes generally got fewer points", "C. there doesn't seem to be a correlation between minutes and points"],
-                correct: "A",
-                code: "px.scatter(data, x='MIN', y='PTS', color='TEAM', title='Points versus Minutes Played Per Game', hover_data=['PLAYER', 'TEAM', 'SEASON'])",
-                code_output: "Visualization1"
-
-
-            },
             {
                 type: "short answer",
                 text: "Where are we going to use data from?",
@@ -99,13 +87,21 @@
                 code: "teams = data['team'].unique()<br>display(teams)<br>display(len(teams))",
                 code_output: "array(['Atlanta Dream', 'Chicago Sky', 'Connecticut Sun', 'Dallas Wings', 'Indiana Fever', 'Las Vegas Aces', 'Los Angeles Sparks', 'Minnesota Lynx', 'New York Liberty', 'Phoenix Mercury', 'Seattle Storm', 'Washington Mystics'], dtype=object)<br>12"
             },
+            {
+                type: "multiple choice",
+                text: "Let's create a visualization of points versus minutes played per game.<br>What is the trend you see in the data?",
+                choices: ["A. players with more minutes generally got fewer points ", "B. players with more minutes generally got more points", "C. there doesn't seem to be a correlation between minutes and points"],
+                correct: "B",
+                code: "px.scatter(data, x='MIN', y='PTS', color='TEAM', title='Points versus Minutes Played Per Game', hover_data=['PLAYER', 'TEAM', 'SEASON'])",
+                code_output: "Visualization1"
+            },
             
         ];
         let currentQuestionIndex = 0;
 
         function displayQuestion() {
             const currentQuestion = questions[currentQuestionIndex];
-            document.getElementById('question').textContent = currentQuestion.text;
+            document.getElementById('question').innerHTML = currentQuestion.text;
             document.getElementById('answerInput').value = "";
 
             if (currentQuestion.type === "multiple choice") {
@@ -116,6 +112,12 @@
                     return `<div><input type="radio" name="choice" id="choice${index}" value="${choice}"><label for="choice${index}">${choice}</label></div>`;
                 }).join("");
                 answerChoicesDiv.innerHTML = choicesHtml;
+                // Add event listeners to radio buttons
+                choices.forEach((choice, index) => {
+                    document.getElementById(`choice${index}`).addEventListener('change', function() {
+                        document.getElementById('answerInput').value = choice.charAt(0);
+                    });
+                });
             } else {
                 document.getElementById('answerChoices').style.display = "none";
             }
@@ -123,8 +125,6 @@
             const codeDiv = document.getElementById('code');
             const codeOutputDiv = document.getElementById('code_output');
             const codePlayButton = document.getElementById('codePlayButton');
-            const dataOutputDiv = document.getElementById('data_output');
-            dataOutputDiv.style.display = "none";
             const code = currentQuestion.code;
             const code_output = currentQuestion.code_output;
             codeDiv.innerHTML = code;
@@ -149,21 +149,14 @@
 
         function displayCodeOutput() {
             const codeOutputDiv = document.getElementById('code_output');
-            const dataOutputDiv = document.getElementById('data_output');
-            const visualizationDiv = document.getElementById('visualization');
             if (codeOutputDiv.innerHTML.includes("DisplayData")) {
-                codeOutputDiv.style.display = "none";
-                dataOutputDiv.style.display = "block";
-                visualizationDiv.style.display = "none";
+                codeOutputDiv.style.display = "block";
+                codeOutputDiv.innerHTML = "<iframe src='data_display.html' height='500' width='100%'></iframe>";
             } else if (codeOutputDiv.innerHTML.includes("Visualization1")) {
-                codeOutputDiv.style.display = "none";
-                dataOutputDiv.style.display = "none";
-                visualizationDiv.innerHTML = "<iframe src='visualization1.html' height='500' width='100%'></iframe>";
-                visualizationDiv.style.display = "block";
+                codeOutputDiv.style.display = "block";
+                codeOutputDiv.innerHTML = "<iframe src='visualization1.html' height='500' width='100%'></iframe>";
             } else {
                 codeOutputDiv.style.display = "block";
-                dataOutputDiv.style.display = "none";
-                visualizationDiv.style.display = "none";
             }
         }
 
