@@ -15,9 +15,9 @@
             margin-bottom: 20px;
         }
         #code {
-            background-color: #f4f4f4;
             padding: 10px;
             border-radius: 5px;
+            background-color: #f4f4f4;
             text-align: left;
             font-family: monospace;
             white-space: pre-wrap;
@@ -34,6 +34,8 @@
             margin-bottom: 10px;
         }
         button {
+            background-color: #0056ac;
+            color: white;
             padding: 2px;
             /* min-width: 100px; */
         }
@@ -42,9 +44,7 @@
             margin-top: 20px;
         }
     </style>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-python.min.js"></script>
+
 </head>
 <body>
     <h1>Basketball Data Labyrinth</h1>
@@ -55,11 +55,30 @@
         <button onclick="checkAnswer()">Submit</button>
         <div id="result"></div>
         <div id="code" class="language-python"></div>
-        <button onclick="toggleCodeOutput()" id="codePlayButton" style="display: none;">▶</button>
+        <button onclick="displayCodeOutput()" id="codePlayButton" style="display: none;">▶</button>
         <br>
         <div id="code_output"></div>
+        <div id="data_output" style="display: none; font-size: smaller; text-align: left;">
+            <table border="1" class="dataframe">
+                <thead><tr><th></th><th>PLAYER</th><th>SEASON</th><th>TEAM</th><th>TEAM_ID</th><th>GP</th><th>MIN</th><th>PTS</th><th>FGM</th><th>FGA</th><th>FG%</th><th>...</th><th>FT%</th><th>OREB</th><th>DREB</th><th>REB</th><th>AST</th><th>TOV</th><th>STL</th><th>BLK</th><th>PF</th><th>+/-</th></tr></thead>
+                <tbody>
+                    <tr><td>0</td><td>Aari McDonald</td><td>1997</td><td>Atlanta Dream</td><td>1611661330</td><td>5</td><td>28.7</td><td>6.0</td><td>2.0</td><td>7.6</td><td>26.3</td><td>...</td><td>50.0</td><td>0.0</td><td>2.4</td><td>2.4</td><td>3.8</td><td>2.0</td><td>0.2</td><td>0.0</td><td>2.2</td><td>0.8</td></tr>
+                    <tr><td>1</td><td>Allisha Gray</td><td>1997</td><td>Atlanta Dream</td><td>1611661330</td><td>13</td><td>32.4</td><td>17.7</td><td>5.9</td><td>12.5</td><td>47.2</td><td>...</td><td>84.2</td><td>1.3</td><td>4.0</td><td>5.3</td><td>2.8</td><td>2.2</td><td>0.9</td><td>0.2</td><td>2.5</td><td>-5.7</td></tr>
+                    <tr><td>2</td><td>Asia (AD) Durr</td><td>1997</td><td>Atlanta Dream</td><td>1611661330</td><td>13</td><td>14.8</td><td>6.9</td><td>2.5</td><td>7.2</td><td>35.5</td><td>...</td><td>78.9</td><td>0.2</td><td>1.1</td><td>1.3</td><td>1.2</td><td>0.8</td><td>0.3</td><td>0.2</td><td>1.1</td><td>-1.0</td></tr>
+                    <tr><td>3</td><td>Cheyenne Parker</td><td>1997</td><td>Atlanta Dream</td><td>1611661330</td><td>13</td><td>27.2</td><td>16.1</td><td>6.2</td><td>12.5</td><td>50.0</td><td>...</td><td>89.1</td><td>2.9</td><td>4.4</td><td>7.3</td><td>1.5</td><td>3.0</td><td>1.6</td><td>1.3</td><td>2.5</td><td>-2.2</td></tr>
+                    <tr><td>4</td><td>Danielle Robinson</td><td>1997</td><td>Atlanta Dream</td><td>1611661330</td><td>5</td><td>14.4</td><td>5.4</td><td>2.2</td><td>4.6</td><td>47.8</td><td>...</td><td>50.0</td><td>0.2</td><td>1.2</td><td>1.4</td><td>2.6</td><td>1.6</td><td>0.4</td><td>0.0</td><td>3.0</td><td>-7.2</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>4270</td><td>Myisha Hines-Allen</td><td>2023</td><td>Washington Mystics</td><td>1611661322</td><td>9</td><td>12.4</td><td>4.2</td><td>1.6</td><td>5.2</td><td>29.8</td><td>...</td><td>54.5</td><td>0.9</td><td>1.8</td><td>2.7</td><td>0.7</td><td>0.8</td><td>0.4</td><td>0.1</td><td>1.7</td><td>-1.6</td></tr>
+                    <tr><td>4271</td><td>Natasha Cloud</td><td>2023</td><td>Washington Mystics</td><td>1611661322</td><td>13</td><td>31.3</td><td>11.0</td><td>3.4</td><td>8.6</td><td>39.3</td><td>...</td><td>89.4</td><td>0.2</td><td>3.3</td><td>3.5</td><td>6.1</td><td>2.2</td><td>1.0</td><td>0.2</td><td>2.2</td><td>3.0</td></tr>
+                    <tr><td>4272</td><td>Shakira Austin</td><td>2023</td><td>Washington Mystics</td><td>1611661322</td><td>13</td><td>26.2</td><td>11.4</td><td>4.6</td><td>9.1</td><td>50.8</td><td>...</td><td>63.6</td><td>1.6</td><td>6.2</td><td>7.8</td><td>0.9</td><td>2.2</td><td>0.8</td><td>1.0</td><td>2.7</td><td>3.0</td></tr>
+                    <tr><td>4273</td><td>Shatori Walker-Kimbrough</td><td>2023</td><td>Washington Mystics</td><td>1611661322</td><td>14</td><td>18.2</td><td>3.7</td><td>1.1</td><td>3.6</td><td>32.0</td><td>...</td><td>100.0</td><td>0.3</td><td>1.3</td><td>1.6</td><td>0.9</td><td>0.4</td><td>0.6</td><td>0.4</td><td>0.9</td><td>-1.3</td></tr>
+                    <tr><td>4274</td><td>Tianna Hawkins</td><td>2023</td><td>Washington Mystics</td><td>1611661322</td><td>14</td><td>16.0</td><td>5.1</td><td>2.1</td><td>4.4</td><td>47.5</td><td>...</td><td>83.3</td><td>0.9</td><td>3.5</td><td>4.4</td><td>0.9</td><td>1.1</td><td>0.5</td><td>0.2</td><td>2.1</td><td>0.9</td></tr>
+                </tbody>
+            </table>
+            4275 rows × 25 columns
+        </div>
         <hr>
-        <button onclick="previousQuestion()" id="backButton" style="display: none;">Previous Question</button>
+        <div style="text-align: right;"><button onclick="previousQuestion()" id="backButton" style="display: none;">Previous Question</button></div>
     </div>
 
     <script>
@@ -74,7 +93,7 @@
                 text: "What is the first season (year) that we have data for?",
                 correct: "1997",
                 code: "data = pd.read_csv('data/wnba-player-scoring-1997-2023.csv')<br>display(data)", 
-                code_output: "TODO: INCLUDE THE DATA HERE"
+                code_output: "DisplayDataHere"
             },
             {
                 text: "How many WNBA teams are in the data set?",
@@ -83,7 +102,6 @@
                 code_output: "array(['Atlanta Dream', 'Chicago Sky', 'Connecticut Sun', 'Dallas Wings', 'Indiana Fever', 'Las Vegas Aces', 'Los Angeles Sparks', 'Minnesota Lynx', 'New York Liberty', 'Phoenix Mercury', 'Seattle Storm', 'Washington Mystics'], dtype=object)<br>12"
             }
         ];
-
         let currentQuestionIndex = 0;
 
         function displayQuestion() {
@@ -93,6 +111,8 @@
             const codeDiv = document.getElementById('code');
             const codeOutputDiv = document.getElementById('code_output');
             const codePlayButton = document.getElementById('codePlayButton');
+            const dataOutputDiv = document.getElementById('data_output');
+            dataOutputDiv.style.display = "none";
             const code = currentQuestion.code;
             const code_output = currentQuestion.code_output;
             codeDiv.innerHTML = code;
@@ -115,12 +135,16 @@
             }
         }
 
-        function toggleCodeOutput() {
+        function displayCodeOutput() {
             const codeOutputDiv = document.getElementById('code_output');
-            if (codeOutputDiv.style.display === "none") {
-                codeOutputDiv.style.display = "block";
-            } else {
+            const dataOutputDiv = document.getElementById('data_output');
+            if (codeOutputDiv.innerHTML.includes("DisplayDataHere")) {
                 codeOutputDiv.style.display = "none";
+                dataOutputDiv.style.display = "block";
+            }
+            else {
+                codeOutputDiv.style.display = "block";
+                dataOutputDiv.style.display = "none";
             }
         }
 
@@ -131,7 +155,7 @@
 
             if (userAnswer.toLowerCase() === currentQuestion.correct.toLowerCase()) {
                 resultDiv.textContent = "Correct!";
-                resultDiv.style.color = "green";
+                resultDiv.style.color = "#0056ac";
                 
                 currentQuestionIndex++;
                 
@@ -154,10 +178,18 @@
             displayQuestion();
         }
 
+            // Add event listener for Enter key
+        document.getElementById('answerInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
         // Prevent right-click context menu
+        /*
         document.addEventListener('contextmenu', event => {
             event.preventDefault();
-        });
+        }); //*/
 
         // Start the quiz
         displayQuestion();
