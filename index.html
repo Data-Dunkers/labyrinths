@@ -55,6 +55,8 @@
         <button onclick="toggleCodeOutput()" id="codePlayButton" style="display: none;">▶</button>
         <br>
         <div id="code_output"></div>
+        <hr>
+        <button onclick="previousQuestion()" id="backButton" style="display: none;">Previous Question</button>
     </div>
 
     <script>
@@ -100,6 +102,14 @@
                 codeDiv.style.display = "block";
                 codePlayButton.style.display = "block";
             }
+
+            // Show or hide the back button
+            const backButton = document.getElementById('backButton');
+            if (currentQuestionIndex > 0) {
+                backButton.style.display = "inline-block";
+            } else {
+                backButton.style.display = "none";
+            }
         }
 
         function toggleCodeOutput() {
@@ -134,6 +144,11 @@
                 resultDiv.textContent = "Incorrect, please try again.";
                 resultDiv.style.color = "red";
             }
+        }
+
+        function previousQuestion() {
+            currentQuestionIndex--;
+            displayQuestion();
         }
 
         // Prevent right-click context menu
