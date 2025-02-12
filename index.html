@@ -46,27 +46,33 @@
     <h1>Basketball Data Labyrinth</h1>
     <div id="quiz-container">
         <div id="question"></div>
-        <div id="code"></div>
-        <button onclick="toggleCodeOutput()">▶</button>
-        <div id="code_output"></div>
         <input type="text" id="answerInput" placeholder="Type your answer here">
         <button onclick="checkAnswer()">Submit</button>
         <div id="result"></div>
+        <div id="code"></div>
+        <button onclick="toggleCodeOutput()" id="codePlayButton" style="display: none;">▶</button>
+        <div id="code_output"></div>
     </div>
 
     <script>
         const questions = [
             {
-                text: "How many championships did Michael Jordan win?",
-                correct: "6",
-                code: "print(3 + 3)",
-                code_output: "6"
+                text: "Where are we going to use data from?",
+                correct: "WNBA",
+                code: "",
+                code_output: ""
             },
             {
-                text: "In what year was the NBA founded?",
-                correct: "1946",
-                code: "", 
-                code_output: " "
+                text: "What is the first season (year) that we have data for?",
+                correct: "1997",
+                code: "data = pd.read_csv('data/wnba-player-scoring-1997-2023.csv')<br>display(data)", 
+                code_output: "TODO: INCLUDE THE DATA HERE"
+            }
+            {
+                text: "How many WNBA teams are in the data set?",
+                correct: "12",
+                code: "teams = data['team'].unique()<br>display(teams)<br>display(len(teams))",
+                code_output: "array(['Atlanta Dream', 'Chicago Sky', 'Connecticut Sun', 'Dallas Wings', 'Indiana Fever', 'Las Vegas Aces', 'Los Angeles Sparks', 'Minnesota Lynx', 'New York Liberty', 'Phoenix Mercury', 'Seattle Storm', 'Washington Mystics'], dtype=object)<br>12"
             }
         ];
 
@@ -75,10 +81,23 @@
         function displayQuestion() {
             const currentQuestion = questions[currentQuestionIndex];
             document.getElementById('question').textContent = currentQuestion.text;
-            document.getElementById('code').textContent = currentQuestion.code;
-            document.getElementById('code_output').innerHTML = currentQuestion.code_output;
             document.getElementById('answerInput').value = "";
-            document.getElementById('code_output').style.display = "none";
+            const codeDiv = document.getElementById('code');
+            const codeOutputDiv = document.getElementById('code_output');
+            const codePlayButton = document.getElementById('codePlayButton');
+            const code = currentQuestion.code;
+            const code_output = currentQuestion.code_output;
+            codeDiv.innerHTML = code;
+            codeOutputDiv.innerHTML = code_output;
+            codeOutputDiv.style.display = "none";
+            if (code === "") {
+                codeDiv.style.display = "none";
+                codeOutputDiv.style.display = "none";
+            } else {
+                codeDiv.style.display = "block";
+                codeOutputDiv.style.display = "block";
+                codePlayButton.style.display = "block";
+            }
         }
 
         function toggleCodeOutput() {
@@ -107,10 +126,10 @@
                         displayQuestion();
                     }, 1000);
                 } else {
-                    resultDiv.textContent = "Congratulations! You completed the Basketball Data Labyrinth!";
+                    resultDiv.textContent = "Congratulations! You completed the Mini Basketball Data Labyrinth!";
                 }
             } else {
-                resultDiv.textContent = "Wrong answer. Try again!";
+                resultDiv.textContent = "Incorrect, please try again.";
                 resultDiv.style.color = "red";
             }
         }
