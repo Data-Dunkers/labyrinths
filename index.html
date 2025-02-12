@@ -104,7 +104,7 @@
                 code_output: "data_columns.html"
             },
             {
-                type: "muliple choice",
+                type: "multiple choice",
                 text: "This code will produce a correlation matrix visualization.<br>Which column is most strongly correlated with PTS (points)?",
                 choices: ["A. GP (games played)", "B. MIN (minutes played)", "C. FGM (field goals made)", "D. FGA (field goals attempted)", "E. FG% (field goal percentage)"],
                 correct: "C",
@@ -112,7 +112,19 @@
                 code_output: "visualization2.html"
             },
             {
-                
+                type: "multiple choice",
+                text: "Of course field goals made (FGM) is strongly correlated with points. We also see that field goals attempted (FGA) is strongly correlated to points, but field goal percentage is not.<br>Two variables that are negatively correlated are 3PA (3 point field goals attempted) and OREB (offensive rebounds). What kind of correlation do you see between these two variables?",
+                choices: ["A. strong positive correlation", "B. strong negative correlation", "C. weak positive correlation", "D. weak negative correlation", "E. no correlation"],
+                correct: "D",
+                code: "px.scatter(data, x='3PA', y='OREB', trendline='ols', title='OREB versus 3PA')",
+                code_output: "visualization3.html"
+            },
+            {
+                type: "short answer",
+                text: "In which year did the Las Vegas Aces score the most points?",
+                correct: "2021",
+                code: "team = 'Las Vegas Aces'<br>filtered_data = data[data['TEAM'] == team]<br>px.bar(filtered_data, x='SEASON', y='PTS', color='PLAYER', title=f'{team} Points per Player by Season')",
+                code_output: "visualization4.html"
             }
             
         ];
