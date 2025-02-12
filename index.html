@@ -98,11 +98,22 @@
             },
             {
                 type: "short answer",
-                text: "There are quite a few other columns in the data set, run the following code cell to display what they mean.<br>What is the column title for free throw percentage?",
+                text: "There are quite a few other columns in the data set.<br>What is the column that contains free throw percentages?",
                 correct: "FT%",
                 code: "data.columns",
                 code_output: "data_columns.html"
             },
+            {
+                type: "muliple choice",
+                text: "This code will produce a correlation matrix visualization.<br>Which column is most strongly correlated with PTS (points)?",
+                choices: ["A. GP (games played)", "B. MIN (minutes played)", "C. FGM (field goals made)", "D. FGA (field goals attempted)", "E. FG% (field goal percentage)"],
+                correct: "C",
+                code: "px.imshow(data.corr(numeric_only=True), height=800, text_auto='.3f', title='WNBA Scoring Data Correlation Matrix')",
+                code_output: "visualization2.html"
+            },
+            {
+                
+            }
             
         ];
         let currentQuestionIndex = 0;
