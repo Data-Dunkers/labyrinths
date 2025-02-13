@@ -188,7 +188,7 @@
             code = code.replace(/'([^']*)'/g, "<span style=\"color: " + stringColor + ";\">'$1'</span>")
             code = '<pre style="font-family:monospace;color: ' + textColor + '; background-color: rgb(255, 255, 255);">' + code + '</pre>';
             code = code.replace(/display|len|False|True|px/g, "<span style=\"color: " + keywordColor + ";\">$&</span>");
-            code = code.replace(/data/g, "<span style=\"color: " + dataColor + ";\">$&</span>");
+            code = code.replace(/data|df/g, "<span style=\"color: " + dataColor + ";\">$&</span>");
             return code
         }
 
@@ -218,8 +218,10 @@
                     }, 1000);
                 } else {
                     resultDiv.innerHTML = "Well done, you have completed the mini basketball data labyrinth (and hopefully also learned some data science).<br><br>";
-                    document.getElementById('question').innerHTML = "What is your name?";
-                    document.getElementById('answer_input').value = "";
+                    const questionDiv = document.getElementById('question');
+                    questionDiv.innerHTML = "What is your name?";
+                    answerDiv = document.getElementById('answer_input')
+                    answerDiv.value = "";
                     document.getElementById('answer_choices').style.display = "none";
                     document.getElementById('code').style.display = "none";
                     document.getElementById('code_output').style.display = "none";
@@ -228,6 +230,11 @@
                     submitButton.style.display = "none";
                     const generateBadgeButton = document.getElementById('generateBadgeButton');
                     generateBadgeButton.style.display = "inline-block";
+                    // move the question question div to below the result div but above the Generate Badge button
+                    const quizContainer = document.getElementById('quiz-container');
+                    quizContainer.insertBefore(questionDiv, generateBadgeButton);
+                    quizContainer.insertBefore(answerDiv, generateBadgeButton);
+                    quizContainer.insertBefore(document.createElement('br'), generateBadgeButton);
                 }
             } else {
                 resultDiv.textContent = "Incorrect, please try again.";
@@ -311,7 +318,11 @@
             // Add event listener for Enter key
         document.getElementById('answer_input').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
-                checkAnswer();
+                if (document.getElementById('generateBadgeButton').style.display === 'none') {
+                    checkAnswer();
+                } else {
+                    generateCompletionBadge();
+                }
             }
         });
 
