@@ -116,7 +116,7 @@
                 text: "Of course field goals made (FGM) is strongly correlated with points. We also see that field goals attempted (FGA) is strongly correlated to points, but field goal percentage is not.<br>Two variables that are negatively correlated are 3PA (3 point field goals attempted) and OREB (offensive rebounds). What kind of correlation do you see between these two variables?",
                 choices: ["A. strong positive correlation", "B. strong negative correlation", "C. weak positive correlation", "D. weak negative correlation", "E. no correlation"],
                 correct: "D",
-                code: "px.scatter(data, x='3PA', y='OREB', trendline='ols', title='OREB versus 3PA')",
+                code: "px.scatter(data, x='3PA', y='OREB', trendline='ols', title='OREB versus 3PA').update_traces(line={'color':'red'})",
                 code_output: "visualization3.html"
             },
             {
