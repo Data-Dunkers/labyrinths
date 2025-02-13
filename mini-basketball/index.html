@@ -54,9 +54,10 @@
         <div id="answerChoices" style="text-align: left; padding-left: 20%;"></div>
         <input type="text" id="answerInput" placeholder="Type your answer here">
         <br>
-        <button onclick="checkAnswer()">Submit</button>
+        <button onclick="checkAnswer()" id="submitButton">Submit</button>
         <div id="result"></div>
         <div id="code" style="display: none;" class="language-python"></div>
+        <button onclick="generateCompletionBadge()" id="generateBadgeButton" style="display: none;">Generate Completion Badge</button>
         <button onclick="displayCodeOutput()" id="codePlayButton" style="display: none;">▶</button>
         <br>
         <div id="code_output"></div>
@@ -201,14 +202,15 @@
                         displayQuestion();
                     }, 1000);
                 } else {
-                    resultDiv.innerHTML = "Well done, you have completed the mini basketball data labyrinth (and hopefully you have also learned some data science).";
-                    questionDiv.innerHTML = "What is your name?";
-                    codeDiv.style.display = "none";
+                    resultDiv.innerHTML = "Well done, you have completed the mini basketball data labyrinth (and hopefully also learned some data science).";
+                    document.getElementById('question').innerHTML = "What is your name?";
+                    document.getElementById('answerInput').value = "";
+                    document.getElementById('code').style.display = "none";
                     codePlayButton.style.display = "none";
-                    // when submit button is clicked, generate a completion badge
                     const submitButton = document.getElementById('submitButton');
-                    submitButton.textContent = "Generate Completion Badge";
-                    submitButton.onclick = generateCompletionBadge();
+                    submitButton.style.display = "none";
+                    const generateBadgeButton = document.getElementById('generateBadgeButton');
+                    generateBadgeButton.style.display = "inline-block";
                 }
             } else {
                 resultDiv.textContent = "Incorrect, please try again.";
@@ -299,7 +301,7 @@
         // Prevent right-click context menu
         document.addEventListener('contextmenu', event => {
             event.preventDefault();
-        });
+        });//*/
 
         // Start the quiz
         displayQuestion();
