@@ -11,6 +11,7 @@
             margin: 5 auto;
             padding: 20px;
             text-align: center;
+            background-color: #ffffff;
         }
         #question {
             margin-bottom: 20px;
@@ -211,7 +212,8 @@
                 resultDiv.textContent = "Correct!";
                 resultDiv.style.color = "#0056ac";
                 currentQuestionIndex++;
-                if (currentQuestionIndex < questions.length) {
+                //if (currentQuestionIndex < questions.length) {
+                if (false) {
                     setTimeout(() => {
                         resultDiv.textContent = "";
                         displayQuestion();
@@ -281,33 +283,45 @@
             const font = new FontFace('RobotoCondensed', `url(${fontUrl})`);
             font.load().then(function(loadedFont) {
                 document.fonts.add(loadedFont);
-            ctx.font = `${fontSize}px RobotoCondensed`;
-            ctx.textAlign = 'center';
-            
-            // Draw text
-            const topPadding = 60;
-            ctx.fillStyle = '#6F4A9E';
-            ctx.fillText(line1Text, width / 2, topPadding);
-            ctx.fillText(line2Text, width / 2, topPadding + fontSize);
-            ctx.fillStyle = '#C8A8D0';
-            ctx.fillText(line3Text, width / 2, topPadding + fontSize * 2 + 10 + 150);
-            ctx.fillStyle = '#8EA2A1';
-            ctx.fillText(line4Text, width / 2, topPadding + fontSize * 3 + 10 + 150);
-            
-            // Add date and hashtags
-            ctx.font = '20px RobotoCondensed';
-            ctx.fillStyle = '#F26622';
-            ctx.fillText(date, 61, topPadding + fontSize * 4 + 12 + 180);
-            ctx.fillText('#datadunkers', 330, topPadding + fontSize * 4 + 12 + 180);
-            //ctx.fillText('#callysto', 190, topPadding + fontSize * 4 + 12 + 180);
+                ctx.font = `${fontSize}px RobotoCondensed`;
+                ctx.textAlign = 'center';
+                
+                // Draw text
+                const topPadding = 60;
+                ctx.fillStyle = '#6F4A9E';
+                ctx.fillText(line1Text, width / 2, topPadding);
+                ctx.fillText(line2Text, width / 2, topPadding + fontSize);
+                ctx.fillStyle = '#C8A8D0';
+                ctx.fillText(line3Text, width / 2, topPadding + fontSize * 2 + 10 + 150);
+                ctx.fillStyle = '#8EA2A1';
+                ctx.fillText(line4Text, width / 2, topPadding + fontSize * 3 + 10 + 150);
+                
+                // Add date and hashtags
+                ctx.font = '20px RobotoCondensed';
+                ctx.fillStyle = '#F26622';
+                ctx.fillText(date, 61, topPadding + fontSize * 4 + 12 + 180);
+                ctx.fillText('#datadunkers', 330, topPadding + fontSize * 4 + 12 + 180);
+                //ctx.fillText('#callysto', 190, topPadding + fontSize * 4 + 12 + 180);
 
-            // Display canvas as image in HTML
-            const imgElement = new Image();
-            imgElement.src = canvas.toDataURL();
-            codeOutputDiv.appendChild(imgElement);
-            codeOutputDiv.style.display = "block";
+                // Display canvas as image in HTML
+                const imgElement = new Image();
+                imgElement.src = canvas.toDataURL();
+                codeOutputDiv.appendChild(imgElement);
+                codeOutputDiv.style.display = "block";
+                codeOutputDiv.style.textAlign = "center";
             });
 
+            // create a download image button
+            const downloadButton = document.createElement('button');
+            downloadButton.textContent = 'Download Badge';
+            downloadButton.onclick = function() {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL();
+                a.download = 'badge.png';
+                a.click();
+            };
+            codeOutputDiv.appendChild(downloadButton);
+            codeOutputDiv.appendChild(document.createElement('br'));
         }
 
         function previousQuestion() {
