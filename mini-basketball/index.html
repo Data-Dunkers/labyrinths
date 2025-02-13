@@ -108,7 +108,7 @@
                 text: "This code will produce a correlation matrix visualization.<br>Which column is most strongly correlated with PTS (points)?",
                 choices: ["A. GP (games played)", "B. MIN (minutes played)", "C. FGM (field goals made)", "D. FGA (field goals attempted)", "E. FG% (field goal percentage)"],
                 correct: "C",
-                code: "px.imshow(data.corr(numeric_only=True), height=800, text_auto='.3f', title='WNBA Scoring Data Correlation Matrix')",
+                code: "px.imshow(data.corr(numeric_only=True), height=800, text_auto='.3f', title='WNBA Scoring Data Correlation Matrix').update_coloraxes(showscale=False)",
                 code_output: "visualization2.html"
             },
             {
