@@ -29,10 +29,13 @@
             text-align: left;
             display: none;
         }
-        #answerInput {
+        #answer_input {
             padding: 10px;
             width: 480px;
             margin-bottom: 10px;
+        }
+        #answer_choices {
+            text-align: left;
         }
         button {
             background-color: #0056ac;
@@ -51,8 +54,8 @@
     <h1>Basketball Data Labyrinth</h1>
     <div id="quiz-container">
         <div id="question"></div>
-        <div id="answerChoices" style="text-align: left; padding-left: 20%;"></div>
-        <input type="text" id="answerInput" placeholder="Type your answer here">
+        <div id="answer_choices" style="text-align: left; padding-left: 20%;"></div>
+        <input type="text" id="answer_input" placeholder="Type your answer here">
         <br>
         <button onclick="checkAnswer()" id="submitButton">Submit</button>
         <div id="result"></div>
@@ -132,10 +135,10 @@
         function displayQuestion() {
             const currentQuestion = questions[currentQuestionIndex];
             document.getElementById('question').innerHTML = currentQuestion.text;
-            document.getElementById('answerInput').value = "";
+            document.getElementById('answer_input').value = "";
 
             if (currentQuestion.type === "multiple choice") {
-                const answerChoicesDiv = document.getElementById('answerChoices');
+                const answerChoicesDiv = document.getElementById('answer_choices');
                 answerChoicesDiv.style.display = "block";
                 const choices = currentQuestion.choices;
                 const choicesHtml = choices.map((choice, index) => {
@@ -145,18 +148,15 @@
                 // Add event listeners to radio buttons
                 choices.forEach((choice, index) => {
                     document.getElementById(`choice${index}`).addEventListener('change', function() {
-                        document.getElementById('answerInput').value = choice.charAt(0);
+                        document.getElementById('answer_input').value = choice.charAt(0);
                     });
                 });
             } else {
-                document.getElementById('answerChoices').style.display = "none";
+                document.getElementById('answer_choices').style.display = "none";
             }
 
             const codeDiv = document.getElementById('code');
             const code = currentQuestion.code;
-            codeDiv.innerHTML = '<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(255, 255, 255);">' + code.replace(/'([^']*)'/g, "<span style=\"color: rgb(136, 0, 0);\">'$1'</span>") + '</pre>';
-            // len False True px pd
-
             const codePlayButton = document.getElementById('codePlayButton');
             const codeOutputDiv = document.getElementById('code_output');
             const code_output = currentQuestion.code_output;
@@ -166,6 +166,7 @@
                 codeDiv.style.display = "none";
                 codeOutputDiv.style.display = "none";
             } else {
+                codeDiv.innerHTML = syntaxHighlight(code);
                 codeDiv.style.display = "block";
                 codePlayButton.style.display = "block";
             }
@@ -179,6 +180,18 @@
             }
         }
 
+        function syntaxHighlight(code) {
+            const textColor = "#000000";
+            const stringColor = "#fc7d36";
+            const keywordColor = "#017cb7";
+            const dataColor = "#6e4d9a";
+            code = code.replace(/'([^']*)'/g, "<span style=\"color: " + stringColor + ";\">'$1'</span>")
+            code = '<pre style="font-family:monospace;color: ' + textColor + '; background-color: rgb(255, 255, 255);">' + code + '</pre>';
+            code = code.replace(/display|len|False|True|px/g, "<span style=\"color: " + keywordColor + ";\">$&</span>");
+            code = code.replace(/data/g, "<span style=\"color: " + dataColor + ";\">$&</span>");
+            return code
+        }
+
         function displayCodeOutput() {
             const codeOutputDiv = document.getElementById('code_output');
             codeOutputDiv.style.display = "block";
@@ -190,7 +203,7 @@
         }
 
         function checkAnswer() {
-            const userAnswer = document.getElementById('answerInput').value.trim();
+            const userAnswer = document.getElementById('answer_input').value.trim();
             const resultDiv = document.getElementById('result');
             const currentQuestion = questions[currentQuestionIndex];
 
@@ -204,10 +217,12 @@
                         displayQuestion();
                     }, 1000);
                 } else {
-                    resultDiv.innerHTML = "Well done, you have completed the mini basketball data labyrinth (and hopefully also learned some data science).";
+                    resultDiv.innerHTML = "Well done, you have completed the mini basketball data labyrinth (and hopefully also learned some data science).<br><br>";
                     document.getElementById('question').innerHTML = "What is your name?";
-                    document.getElementById('answerInput').value = "";
+                    document.getElementById('answer_input').value = "";
+                    document.getElementById('answer_choices').style.display = "none";
                     document.getElementById('code').style.display = "none";
+                    document.getElementById('code_output').style.display = "none";
                     codePlayButton.style.display = "none";
                     const submitButton = document.getElementById('submitButton');
                     submitButton.style.display = "none";
@@ -222,7 +237,7 @@
         }
 
         function generateCompletionBadge() {
-            const name = document.getElementById('answerInput').value.trim();
+            const name = document.getElementById('answer_input').value.trim();
             const codeOutputDiv = document.getElementById('code_output');
             codeOutputDiv.innerHTML = '';
             const now = new Date();
@@ -294,7 +309,7 @@
         }
 
             // Add event listener for Enter key
-        document.getElementById('answerInput').addEventListener('keydown', function(event) {
+        document.getElementById('answer_input').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
                 checkAnswer();
             }
