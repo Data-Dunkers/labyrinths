@@ -70,67 +70,6 @@
     </div>
 
     <script>
-        const questions = [
-            {
-                type: "short answer",
-                text: "Where are we going to use data from?",
-                correct: "WNBA",
-                code: "",
-                code_output: ""
-            },
-            {
-                type: "short answer",
-                text: "What is the first season (year) that we have data for?",
-                correct: "1997",
-                code: "data = pd.read_csv('wnba-player-scoring-1997-2023.csv')<br>display(data)", 
-                code_output: "data_display.html"
-            },
-            {
-                type: "short answer",
-                text: "How many WNBA teams are in the data set?",
-                correct: "12",
-                code: "teams = data['team'].unique()<br>display(teams)<br>display(len(teams))",
-                code_output: "array(['Atlanta Dream', 'Chicago Sky', 'Connecticut Sun', 'Dallas Wings', 'Indiana Fever', 'Las Vegas Aces', 'Los Angeles Sparks', 'Minnesota Lynx', 'New York Liberty', 'Phoenix Mercury', 'Seattle Storm', 'Washington Mystics'], dtype=object)<br>12"
-            },
-            {
-                type: "multiple choice",
-                text: "Let's create a visualization of points versus minutes played per game.<br>What is the trend you see in the data?",
-                choices: ["A. players with more minutes generally got fewer points ", "B. players with more minutes generally got more points", "C. there doesn't seem to be a correlation between minutes and points"],
-                correct: "B",
-                code: "px.scatter(data, x='MIN', y='PTS', color='TEAM', title='Points versus Minutes Played Per Game', hover_data=['PLAYER', 'TEAM', 'SEASON'])",
-                code_output: "visualization1.html"
-            },
-            {
-                type: "short answer",
-                text: "There are quite a few other columns in the data set.<br>What is the column that contains free throw percentages?",
-                correct: "FT%",
-                code: "data.columns",
-                code_output: "data_columns.html"
-            },
-            {
-                type: "multiple choice",
-                text: "This code will produce a correlation matrix visualization.<br>Which column is most strongly correlated with PTS (points)?",
-                choices: ["A. GP (games played)", "B. MIN (minutes played)", "C. FGM (field goals made)", "D. FGA (field goals attempted)", "E. FG% (field goal percentage)"],
-                correct: "C",
-                code: "px.imshow(data.corr(numeric_only=True), height=800, text_auto='.3f', title='WNBA Scoring Data Correlation Matrix').update_coloraxes(showscale=False)",
-                code_output: "visualization2.html"
-            },
-            {
-                type: "multiple choice",
-                text: "Of course field goals made (FGM) is strongly correlated with points. We also see that field goals attempted (FGA) is strongly correlated to points, but field goal percentage is not.<br>Two variables that are negatively correlated are 3PA (3 point field goals attempted) and OREB (offensive rebounds). What kind of correlation do you see between these two variables?",
-                choices: ["A. strong positive correlation", "B. strong negative correlation", "C. weak positive correlation", "D. weak negative correlation", "E. no correlation"],
-                correct: "D",
-                code: "px.scatter(data, x='3PA', y='OREB', trendline='ols', title='OREB versus 3PA').update_traces(line={'color':'red'})",
-                code_output: "visualization3.html"
-            },
-            {
-                type: "short answer",
-                text: "In which year did the Las Vegas Aces score the most points per player?",
-                correct: "2021",
-                code: "team = 'Las Vegas Aces'<br>filtered_data = data[data['TEAM'] == team]<br>px.bar(filtered_data, x='SEASON', y='PTS', color='PLAYER', title=f'{team} Points per Player by Season')",
-                code_output: "visualization4.html"
-            }
-        ];
         let currentQuestionIndex = 0;
 
         function displayQuestion() {
@@ -341,10 +280,73 @@
             }
         });
 
+        /*
         // Prevent right-click context menu
         document.addEventListener('contextmenu', event => {
             event.preventDefault();
         });//*/
+
+        const questions = [
+            {
+                type: "short answer",
+                text: "Where are we going to use data from?",
+                correct: "WNBA",
+                code: "",
+                code_output: ""
+            },
+            {
+                type: "short answer",
+                text: "What is the first season (year) that we have data for?",
+                correct: "1997",
+                code: "data = pd.read_csv('wnba-player-scoring-1997-2023.csv')<br>display(data)", 
+                code_output: "data_display.html"
+            },
+            {
+                type: "short answer",
+                text: "How many WNBA teams are in the data set?",
+                correct: "12",
+                code: "teams = data['team'].unique()<br>display(teams)<br>display(len(teams))",
+                code_output: "array(['Atlanta Dream', 'Chicago Sky', 'Connecticut Sun', 'Dallas Wings', 'Indiana Fever', 'Las Vegas Aces', 'Los Angeles Sparks', 'Minnesota Lynx', 'New York Liberty', 'Phoenix Mercury', 'Seattle Storm', 'Washington Mystics'], dtype=object)<br>12"
+            },
+            {
+                type: "multiple choice",
+                text: "Let's create a visualization of points versus minutes played per game.<br>What is the trend you see in the data?",
+                choices: ["A. players with more minutes generally got fewer points ", "B. players with more minutes generally got more points", "C. there doesn't seem to be a correlation between minutes and points"],
+                correct: "B",
+                code: "px.scatter(data, x='MIN', y='PTS', color='TEAM', title='Points versus Minutes Played Per Game', hover_data=['PLAYER', 'TEAM', 'SEASON'])",
+                code_output: "visualization1.html"
+            },
+            {
+                type: "short answer",
+                text: "There are quite a few other columns in the data set.<br>Which column contains free throw percentages?",
+                correct: "FT%",
+                code: "data.columns",
+                code_output: "data_columns.html"
+            },
+            {
+                type: "multiple choice",
+                text: "This code will produce a correlation matrix visualization.<br>Which column is most strongly correlated with PTS (points)?",
+                choices: ["A. GP (games played)", "B. MIN (minutes played)", "C. FGM (field goals made)", "D. FGA (field goals attempted)", "E. FG% (field goal percentage)"],
+                correct: "C",
+                code: "px.imshow(data.corr(numeric_only=True), height=800, text_auto='.3f', title='WNBA Scoring Data Correlation Matrix').update_coloraxes(showscale=False)",
+                code_output: "visualization2.html"
+            },
+            {
+                type: "multiple choice",
+                text: "Of course field goals made (FGM) is strongly correlated with points. We also see that field goals attempted (FGA) is strongly correlated to points, but field goal percentage is not.<br>Two variables that are negatively correlated are 3PA (3 point field goals attempted) and OREB (offensive rebounds). What kind of correlation do you see between these two variables?",
+                choices: ["A. strong positive correlation", "B. strong negative correlation", "C. weak positive correlation", "D. weak negative correlation", "E. no correlation"],
+                correct: "D",
+                code: "px.scatter(data, x='3PA', y='OREB', trendline='ols', title='OREB versus 3PA').update_traces(line={'color':'red'})",
+                code_output: "visualization3.html"
+            },
+            {
+                type: "short answer",
+                text: "In which year did the Las Vegas Aces score the most points per player?",
+                correct: "2021",
+                code: "team = 'Las Vegas Aces'<br>filtered_data = data[data['TEAM'] == team]<br>px.bar(filtered_data, x='SEASON', y='PTS', color='PLAYER', title=f'{team} Points per Player by Season')",
+                code_output: "visualization4.html"
+            }
+        ];
 
         // Start the quiz
         displayQuestion();
