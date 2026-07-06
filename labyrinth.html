@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Labyrinth</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
+<style>
+  :root{
+    --bg: #0c0e12;
+    --bg-grid: #101319;
+    --panel: #151920;
+    --panel-alt: #1b212a;
+    --border: #262d38;
+    --text: #e7ecf4;
+    --muted: #8a94a5;
+    --accent: #38e6c6;
+    --accent-dim: rgba(56,230,198,0.14);
+    --warn: #f0a63a;
+    --error: #ef6a6a;
+    --font-display: 'Space Mono', monospace;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-code: 'JetBrains Mono', monospace;
+    --radius: 8px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 39px, var(--bg-grid) 39px, var(--bg-grid) 40px),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, var(--bg-grid) 39px, var(--bg-grid) 40px),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  #app{
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 22px 18px 130px;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    display:flex; flex-direction:column; gap:14px;
+    margin-bottom: 22px;
+  }
+  .title-row{
+    display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  h1{
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    margin:0;
+    font-weight:700;
+  }
+  h1 span{ color: var(--accent); }
+  .room-control{
+    display:flex; align-items:center; gap:8px;
+    font-family: var(--font-code);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .room-control input{
+    background: var(--panel-alt);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-code);
+    font-size: 12.5px;
+    padding: 5px 8px;
+    border-radius: 5px;
+    width: 120px;
+  }
+  .room-control input:focus-visible{ outline: 2px solid var(--accent); outline-offset:1px; }
+  .icon-btn{
+    background:none; border:1px solid var(--border); color:var(--muted);
+    font-family:var(--font-code); font-size:11.5px; padding:5px 9px; border-radius:5px;
+    cursor:pointer;
+  }
+  .icon-btn:hover{ color:var(--text); border-color:var(--muted); }
+
+  .status-row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family: var(--font-code); font-size: 11.5px; color: var(--muted);
+    border:1px solid var(--border); padding:4px 10px; border-radius:999px;
+    background: var(--panel);
+  }
+  .status-dot{ width:7px; height:7px; border-radius:50%; background: var(--warn); }
+  .status-pill.ready .status-dot{ background: var(--accent); box-shadow:0 0 6px var(--accent); }
+  .status-pill.error .status-dot{ background: var(--error); }
+
+  /* maze trail — signature element, one node per step in the labyrinth */
+  .trail{ display:flex; align-items:center; gap:0; overflow-x:auto; max-width:100%; padding:6px 2px; }
+  .trail .node{
+    width:10px; height:10px; flex:0 0 auto;
+    background: var(--border);
+    transform: rotate(45deg);
+    position:relative;
+  }
+  .trail .node::after{
+    content:''; position:absolute; top:50%; left:100%; width:16px; height:1px;
+    background: var(--border); transform: translateY(-50%) rotate(-45deg);
+  }
+  .trail .node:last-child::after{ display:none; }
+  .trail .node.done{ background: var(--muted); }
+  .trail .node:nth-child(odd){ margin-top: -6px; }
+  .trail .node:nth-child(even){ margin-top: 6px; }
+  .trail .node.current{ background: var(--accent); box-shadow:0 0 8px var(--accent); animation: pulse 1.8s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce){ .trail .node.current{ animation:none; } }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.55; } }
+
+  /* ---------- panels ---------- */
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .panel-label{
+    font-family: var(--font-code);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    background: var(--panel-alt);
+  }
+  .panel-label .tools{ display:flex; gap:6px; }
+  .panel-label button{
+    font-family: var(--font-code);
+    font-size: 11px;
+    background:none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 9px;
+    border-radius: 5px;
+    cursor:pointer;
+  }
+  .panel-label button:hover:not(:disabled){ color: var(--text); border-color: var(--accent); }
+  .panel-label button:disabled{ opacity:0.4; cursor:not-allowed; }
+  .panel-label button.primary{ color: var(--accent); border-color: var(--accent-dim); }
+  .panel-label button.primary:hover:not(:disabled){ background: var(--accent-dim); }
+
+  /* instructions */
+  #instructions{
+    padding: 18px 20px;
+    font-size: 14.5px;
+  }
+  #instructions h1, #instructions h2, #instructions h3{ font-family: var(--font-display); color: var(--text); }
+  #instructions code{ font-family: var(--font-code); background: var(--panel-alt); padding: 1px 5px; border-radius:4px; font-size:13px; }
+  #instructions pre{ background: var(--panel-alt); padding:12px; border-radius:6px; overflow-x:auto; }
+  #instructions a{ color: var(--accent); }
+  #instructions p:last-child{ margin-bottom:0; }
+  #instructions.placeholder{ color: var(--muted); font-style: italic; }
+
+  /* code editor */
+  .CodeMirror{
+    font-family: var(--font-code) !important;
+    font-size: 13.5px;
+    background: #0e1116 !important;
+    color: var(--text) !important;
+    height: 230px;
+  }
+  .CodeMirror-gutters{ background: #0e1116 !important; border-right: 1px solid var(--border) !important; }
+  .CodeMirror-linenumber{ color: #454e5c !important; }
+  .CodeMirror-cursor{ border-left: 1.5px solid var(--accent) !important; }
+  .cm-s-default .cm-keyword{ color:#38e6c6; }
+  .cm-s-default .cm-string{ color:#e0c15f; }
+  .cm-s-default .cm-number{ color:#c792ea; }
+  .cm-s-default .cm-comment{ color:#5c6570; font-style:italic; }
+  .cm-s-default .cm-def, .cm-s-default .cm-variable-2{ color:#7fb7e8; }
+  .cm-s-default .cm-operator{ color:#e7ecf4; }
+
+  /* output */
+  #output{
+    padding: 14px 18px;
+    min-height: 80px;
+    max-height: 420px;
+    overflow-y: auto;
+    font-family: var(--font-code);
+    font-size: 13px;
+  }
+  #output:empty::before{
+    content: 'Run your code — printed text, tables, and Plotly charts will land here.';
+    color: var(--muted); font-style: italic; font-family: var(--font-body); font-size: 13.5px;
+  }
+  .out-text{ white-space: pre-wrap; word-break: break-word; margin: 0 0 10px; color: var(--text); }
+  .out-error{ white-space: pre-wrap; word-break: break-word; margin: 0 0 10px; color: var(--error); }
+  .out-warn{ white-space: pre-wrap; word-break: break-word; margin: 0 0 10px; color: var(--warn); }
+  .out-chart{ margin: 4px 0 16px; background:#fff; border-radius:6px; padding:6px; }
+  .out-html{ margin: 0 0 16px; overflow-x:auto; }
+  table.df-table{ border-collapse: collapse; font-size: 12.5px; width:100%; }
+  table.df-table th{ background: var(--panel-alt); color: var(--accent); text-align:left; padding:6px 10px; border-bottom:1px solid var(--border); position:sticky; top:0; }
+  table.df-table td{ padding: 5px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+  table.df-table tr:nth-child(even) td{ background: rgba(255,255,255,0.02); }
+
+  /* ---------- answer bar ---------- */
+  .answer-bar{
+    position: fixed; left:0; right:0; bottom:0;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 14px 18px;
+    display:flex; justify-content:center;
+  }
+  .answer-inner{ width:100%; max-width: 884px; }
+  .answer-form{ display:flex; gap:10px; align-items:center; }
+  .prompt-glyph{ font-family: var(--font-code); color: var(--accent); font-size: 15px; }
+  #answerInput{
+    flex:1;
+    background: var(--panel-alt);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-code);
+    font-size: 14px;
+    padding: 11px 12px;
+    border-radius: 6px;
+  }
+  #answerInput:focus-visible{ outline: 2px solid var(--accent); outline-offset:1px; }
+  #answerInput::placeholder{ color: #545e6c; }
+  #submitBtn{
+    font-family: var(--font-code);
+    font-size: 13px;
+    background: var(--accent);
+    color: #06110e;
+    border:none;
+    padding: 11px 18px;
+    border-radius: 6px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  #submitBtn:disabled{ opacity:0.4; cursor:not-allowed; }
+  #submitBtn:hover:not(:disabled){ filter:brightness(1.08); }
+  .answer-msg{ font-family: var(--font-code); font-size: 12px; margin-top:7px; min-height:16px; }
+  .answer-msg.error{ color: var(--error); }
+  .answer-msg.ok{ color: var(--accent); }
+
+  @media (max-width: 560px){
+    .answer-bar{ padding: 10px 12px; }
+    #app{ padding-bottom: 150px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="title-row">
+      <h1>DATA <span>LABYRINTH</span></h1>
+      <div class="room-control">
+        ROOM
+        <input id="roomInput" type="text" spellcheck="false">
+        <button class="icon-btn" id="switchRoomBtn" title="Switch to this room">switch</button>
+        <button class="icon-btn" id="resetBtn" title="Clear saved progress for this room">reset</button>
+      </div>
+    </div>
+    <div class="status-row">
+      <div class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">booting engine…</span></div>
+      <div class="trail" id="trail"></div>
+    </div>
+  </header>
+
+  <!-- 1. instructions -->
+  <div class="panel">
+    <div class="panel-label">Instructions</div>
+    <div id="instructions" class="placeholder">Enter your access key in the field below to begin.</div>
+  </div>
+
+  <!-- 2. code input -->
+  <div class="panel">
+    <div class="panel-label">
+      Code
+      <div class="tools">
+        <button id="clearOutputBtn" type="button">clear output</button>
+        <button id="runBtn" class="primary" type="button" disabled>run ▸ (ctrl+enter)</button>
+      </div>
+    </div>
+    <textarea id="codeInput"># explore the data here
+</textarea>
+  </div>
+
+  <!-- 3. output -->
+  <div class="panel">
+    <div class="panel-label">Output</div>
+    <div id="output"></div>
+  </div>
+
+</div>
+
+<!-- 4. answer box -->
+<div class="answer-bar">
+  <div class="answer-inner">
+    <form class="answer-form" id="answerForm">
+      <span class="prompt-glyph">&gt;</span>
+      <input id="answerInput" type="text" autocomplete="off" placeholder="enter your key / answer…">
+      <button id="submitBtn" type="submit" disabled>submit</button>
+    </form>
+    <div class="answer-msg" id="answerMsg"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzlKK-NaCbHgvsjZT7cyycEiRWEW1sjfmIERlKORKy7eoAMMvRyXFUOpP-lvgLpLCQA/exec';
+
+  const RUNNER_PY = `
+import ast
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
+import pandas as pd
+from js import window
+
+def _render(val):
+    if val is None:
+        return
+    mod = type(val).__module__
+    if mod.startswith('plotly.graph_objs'):
+        window.appendOutputPlotly(val.to_json())
+    elif mod.startswith('pandas') and hasattr(val, 'to_html'):
+        window.appendOutputHtml(val.to_html(classes='df-table', border=0))
+    else:
+        print(repr(val))
+
+def display(val):
+    _render(val)
+
+def run_user_code(code):
+    tree = ast.parse(code, mode='exec')
+    last_expr = None
+    if tree.body and isinstance(tree.body[-1], ast.Expr):
+        last_expr = tree.body.pop()
+    exec(compile(tree, '<cell>', 'exec'), globals())
+    if last_expr is not None:
+        val = eval(compile(ast.Expression(last_expr.value), '<cell>', 'eval'), globals())
+        _render(val)
+`;
+
+  // ---------- state ----------
+  let room = new URLSearchParams(location.search).get('room') || 'Basketball';
+  let n = 0;
+  let pyodide = null;
+  let pyodideReady = false;
+  let plotCounter = 0;
+
+  const el = {
+    roomInput: document.getElementById('roomInput'),
+    switchRoomBtn: document.getElementById('switchRoomBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    statusPill: document.getElementById('statusPill'),
+    statusText: document.getElementById('statusText'),
+    trail: document.getElementById('trail'),
+    instructions: document.getElementById('instructions'),
+    output: document.getElementById('output'),
+    runBtn: document.getElementById('runBtn'),
+    clearOutputBtn: document.getElementById('clearOutputBtn'),
+    answerForm: document.getElementById('answerForm'),
+    answerInput: document.getElementById('answerInput'),
+    submitBtn: document.getElementById('submitBtn'),
+    answerMsg: document.getElementById('answerMsg'),
+  };
+
+  el.roomInput.value = room;
+
+  // ---------- storage ----------
+  function storageKey(){ return 'labyrinth_state_' + room; }
+  function loadState(){
+    try {
+      const raw = localStorage.getItem(storageKey());
+      return raw ? JSON.parse(raw) : null;
+    } catch(e){ return null; }
+  }
+  function saveState(markdown, code){
+    try { localStorage.setItem(storageKey(), JSON.stringify({ n, markdown, code })); } catch(e){}
+  }
+  function clearState(){
+    try { localStorage.removeItem(storageKey()); } catch(e){}
+  }
+
+  // ---------- status / trail ----------
+  function setStatus(text, kind){
+    el.statusText.textContent = text;
+    el.statusPill.className = 'status-pill' + (kind ? ' ' + kind : '');
+  }
+
+  function updateTrail(){
+    el.trail.innerHTML = '';
+    const cap = 16;
+    const start = Math.max(1, n - cap + 1);
+    for(let i = start; i <= n; i++){
+      const node = document.createElement('div');
+      node.className = 'node done';
+      if(i === n) node.className += ' current';
+      el.trail.appendChild(node);
+    }
+    if(n === 0){
+      const node = document.createElement('div');
+      node.className = 'node current';
+      el.trail.appendChild(node);
+    }
+  }
+
+  // ---------- instructions ----------
+  function renderInstructions(markdown){
+    el.instructions.classList.remove('placeholder');
+    el.instructions.innerHTML = marked.parse(markdown || '');
+  }
+
+  // ---------- output rendering ----------
+  function getTextBlock(){
+    const last = el.output.lastElementChild;
+    if(last && last.classList.contains('out-text')) return last;
+    const pre = document.createElement('pre');
+    pre.className = 'out-text';
+    el.output.appendChild(pre);
+    return pre;
+  }
+
+  window.appendOutputText = function(msg){
+    if(!msg) return;
+    getTextBlock().textContent += msg;
+    el.output.scrollTop = el.output.scrollHeight;
+  };
+
+  function appendOutputError(msg){
+    const pre = document.createElement('pre');
+    pre.className = 'out-error';
+    pre.textContent = msg;
+    el.output.appendChild(pre);
+    el.output.scrollTop = el.output.scrollHeight;
+  }
+
+  function appendOutputWarn(msg){
+    const pre = document.createElement('pre');
+    pre.className = 'out-warn';
+    pre.textContent = msg;
+    el.output.appendChild(pre);
+    el.output.scrollTop = el.output.scrollHeight;
+  }
+
+  window.appendOutputHtml = function(html){
+    const div = document.createElement('div');
+    div.className = 'out-html';
+    div.innerHTML = html;
+    el.output.appendChild(div);
+    el.output.scrollTop = el.output.scrollHeight;
+  };
+
+  window.appendOutputPlotly = function(figJson){
+    const wrap = document.createElement('div');
+    wrap.className = 'out-chart';
+    const id = 'plot-' + (plotCounter++);
+    wrap.id = id;
+    el.output.appendChild(wrap);
+    try {
+      const fig = JSON.parse(figJson);
+      Plotly.newPlot(id, fig.data, fig.layout || {}, { responsive: true });
+    } catch(e){
+      appendOutputError('Could not render chart: ' + e.message);
+    }
+    el.output.scrollTop = el.output.scrollHeight;
+  };
+
+  // ---------- code editor ----------
+  const editor = CodeMirror.fromTextArea(document.getElementById('codeInput'), {
+    mode: 'python',
+    lineNumbers: true,
+    indentUnit: 4,
+    tabSize: 4,
+    matchBrackets: true,
+    viewportMargin: Infinity,
+    extraKeys: {
+      'Ctrl-Enter': runCode,
+      'Cmd-Enter': runCode
+    }
+  });
+
+  async function runCode(){
+    if(!pyodideReady) return;
+    el.output.innerHTML = '';
+    const code = editor.getValue();
+    el.runBtn.disabled = true;
+    try {
+      pyodide.globals.set('__user_code__', code);
+      await pyodide.runPythonAsync('run_user_code(__user_code__)');
+    } catch(err){
+      appendOutputError(err.message || String(err));
+    } finally {
+      el.runBtn.disabled = false;
+    }
+  }
+  el.runBtn.addEventListener('click', runCode);
+  el.clearOutputBtn.addEventListener('click', () => { el.output.innerHTML = ''; });
+
+  // ---------- backend check ----------
+  async function submitAnswer(query){
+    el.submitBtn.disabled = true;
+    el.answerMsg.className = 'answer-msg';
+    el.answerMsg.textContent = '';
+    try {
+      const url = ENDPOINT + '?room=' + encodeURIComponent(room) + '&query=' + encodeURIComponent(query) + '&n=' + n;
+      const res = await fetch(url);
+      const data = await res.json();
+      if(!data || typeof data.markdown !== 'string') throw new Error('bad response');
+      n = data.n;
+      renderInstructions(data.markdown);
+      if(typeof data.code === 'string'){
+        editor.setValue(data.code);
+      }
+      updateTrail();
+      saveState(data.markdown, data.code || '');
+      el.answerInput.value = '';
+      el.answerMsg.className = 'answer-msg ok';
+      el.answerMsg.textContent = 'accepted — instructions updated.';
+    } catch(err){
+      el.answerMsg.className = 'answer-msg error';
+      el.answerMsg.textContent = 'Make sure you have entered the key correctly.';
+    } finally {
+      el.submitBtn.disabled = !pyodideReady;
+    }
+  }
+
+  el.answerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = el.answerInput.value.trim();
+    if(!q) return;
+    submitAnswer(q);
+  });
+
+  // ---------- room switching ----------
+  function activateRoom(newRoom, { resetProgress } = {}){
+    room = newRoom || 'Basketball';
+    el.roomInput.value = room;
+    n = 0;
+    el.output.innerHTML = '';
+    el.answerMsg.textContent = '';
+    if(resetProgress) clearState();
+    const saved = loadState();
+    if(saved){
+      n = saved.n || 0;
+      renderInstructions(saved.markdown || '');
+      editor.setValue(saved.code || '');
+    } else {
+      el.instructions.classList.add('placeholder');
+      el.instructions.textContent = 'Enter your access key in the field below to begin.';
+      editor.setValue('# explore the data here\n');
+    }
+    updateTrail();
+  }
+
+  el.switchRoomBtn.addEventListener('click', () => {
+    activateRoom(el.roomInput.value.trim());
+  });
+  el.resetBtn.addEventListener('click', () => {
+    if(confirm('Clear saved progress for room "' + room + '"?')){
+      activateRoom(room, { resetProgress: true });
+    }
+  });
+
+  // ---------- boot pyodide ----------
+  async function boot(){
+    activateRoom(room);
+    try {
+      setStatus('loading pyodide…');
+      pyodide = await loadPyodide();
+
+      pyodide.setStdout({ batched: (msg) => window.appendOutputText(msg + '\n') });
+      pyodide.setStderr({ batched: (msg) => appendOutputWarn(msg) });
+
+      setStatus('loading pandas…');
+      await pyodide.loadPackage(['pandas', 'micropip']);
+
+      setStatus('loading plotly…');
+      await pyodide.runPythonAsync("import micropip\nawait micropip.install('plotly')");
+
+      setStatus('starting runtime…');
+      await pyodide.runPythonAsync(RUNNER_PY);
+
+      pyodideReady = true;
+      el.runBtn.disabled = false;
+      el.submitBtn.disabled = false;
+      setStatus('ready', 'ready');
+    } catch(err){
+      setStatus('engine failed to load — reload page', 'error');
+      console.error(err);
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
