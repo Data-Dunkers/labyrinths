@@ -313,7 +313,7 @@
                 text: "Vamos a crear una visualización de puntos frente a minutos jugados por partido.<br>¿Que tendencia observas en los datos?",
                 choices: ["A. las jugadoras con mas minutos suelen anotar menos puntos", "B. las jugadoras con mas minutos suelen anotar mas puntos", "C. no parece haber correlacion entre minutos y puntos"],
                 correct: "B",
-                code: "px.scatter(datos, x='MIN', y='PTS', color='TEAM', title='Puntos frente a minutos jugados por partido', hover_data=['PLAYER', 'TEAM', 'SEASON'])",
+                code: "px.scatter(datos, x='MIN', y='PTS', color='EQUIPO', title='Puntos por partido en función de los minutos jugados por partido', hover_data=['JUGADOR', 'EQUIPO', 'TEMPORADA'])",
                 code_output: "visualizacion1.html"
             },
             {
@@ -343,7 +343,7 @@
                 type: "short answer",
                 text: "¿En qué año anotaron Las Vegas Aces la mayor cantidad de puntos por jugadora?",
                 correct: "2021",
-                code: "equipo = 'Las Vegas Aces'<br>datos_filtrados = datos[datos['TEAM'] == equipo]<br>px.bar(datos_filtrados, x='SEASON', y='PTS', color='PLAYER', title=f'Puntos por jugadora de {equipo} por temporada')",
+                code: "equipo = 'Las Vegas Aces'<br>datos_filtrados = datos[datos['EQUIPO'] == equipo]<br>px.bar(datos_filtrados, x='TEMPORADA', y='PTS', color='JUGADOR', title=f'Puntos por jugadora de {equipo} por temporada')",
                 code_output: "visualizacion4.html"
             }
         ];
