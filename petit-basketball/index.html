@@ -313,7 +313,7 @@
                 text: "Créons une visualisation des points par rapport aux minutes jouées par match.<br>Parmi les tendances suivantes, quelles sont celles que vous observez dans la visualisation ?",
                 choices: ["A. Les joueurs qui ont plus de minutes ont généralement moins de points.", "B. Les joueurs qui ont plus de minutes ont généralement plus de points.", "C. Il ne semble pas y avoir de corrélation entre les minutes et les points."],
                 correct: "B",
-                code: "px.scatter(données, x='MIN', y='PTS', color='ÉQUIPE', title='Points par rapport au nombre de minutes jouées par match', hover_data=['JOUEUR', 'ÉQUIPE', 'SAISON'])",
+                code: "px.scatter(données, x='MIN', y='PTS', color='ÉQUIPE', title='Points par match en fonction des minutes jouées par match', hover_data=['JOUEUR', 'ÉQUIPE', 'SAISON'])",
                 code_output: "visualisation1.html"
             },
             {
@@ -326,7 +326,7 @@
             {
                 type: "multiple choice",
                 text: "Ce code produira une visualisation de la matrice de corrélation.<br>Quelle est la colonne qui présente la corrélation la plus forte avec le PTS (points) ?",
-                choices: ["A. JJ (jeux joués)", "B. MIN (minutes jouées)", "C. BTM (buts de terrain marqués)", "D. BTT (buts sur le terrain tentés)", "E. BT% (pourcentage de buts sur le terrain)"],
+                choices: ["A. MJ (matchs joués)", "B. MIN (minutes jouées)", "C. TIR (tirs réussis)", "D. TIT (tirs tentés)", "E. TIR% (pourcentage de tirs)"],
                 correct: "C",
                 code: "px.imshow(données.corr(numeric_only=True), height=800, text_auto='.3f', title='Matrice de corrélation des données de la WNBA').update_coloraxes(showscale=False)",
                 code_output: "visualisation2.html"
