@@ -157,9 +157,9 @@
                         displayQuestion();
                     }, 1000);
                 } else {
-                    resultDiv.innerHTML = "Muy bien, has completado el mini laberinto de datos de baloncesto (y esperamos que tambien hayas aprendido algo de ciencia de datos).<br><br>";
+                    resultDiv.innerHTML = "Muy bien, has completado el Mini-laberinto de Datos de Baloncesto (y esperamos que también hayas aprendido algo de ciencia de datos).<br><br>";
                     const questionDiv = document.getElementById('question');
-                    questionDiv.innerHTML = "Como te llamas?";
+                    questionDiv.innerHTML = "¿Cómo te llamas?";
                     answerDiv = document.getElementById('answer_input')
                     answerDiv.value = "";
                     document.getElementById('answer_choices').style.display = "none";
@@ -191,8 +191,8 @@
             const now = new Date();
             const date = now.toISOString().split('T')[0];
             const line1Text = name;
-            const line2Text = 'completo el';
-            const line3Text = 'mini laberinto';
+            const line2Text = 'completó el';
+            const line3Text = 'Mini-laberinto';
             const line4Text = 'Data Dunkers';
             const fontSize = 44;
 
@@ -289,14 +289,14 @@
         const questions = [
             {
                 type: "short answer",
-                text: "Donde vamos a usar datos?",
+                text: "¿Dónde vamos a usar datos?",
                 correct: "WNBA",
                 code: "",
                 code_output: ""
             },
             {
                 type: "short answer",
-                text: "A continuación veras datos sobre la puntuación de jugadoras de la WNBA. ¿Cuál es la primera temporada (año) para la que tenemos datos?",
+                text: "A continuación verás datos sobre la puntuación de jugadoras de la WNBA. ¿Cuál es la primera temporada (año) para la que tenemos datos?",
                 correct: "1997",
                 code: "datos = pd.read_csv('wnba-puntuacion-de-jugadoras-1997-2023.csv')<br>display(datos)", 
                 code_output: "datos-para-mostrar.html"
@@ -319,7 +319,7 @@
             {
                 type: "short answer",
                 text: "Hay bastantes otras columnas en el conjunto de datos.<br>¿Qué columna contiene los porcentajes de tiros libres?",
-                correct: "FT%",
+                correct: "TL%",
                 code: "datos.columns",
                 code_output: "columnas-de-datos.html"
             },
@@ -333,15 +333,15 @@
             },
             {
                 type: "multiple choice",
-                text: "Por supuesto, las canastas anotadas (FGM) estan muy correlacionadas con los puntos. Tambien vemos que los tiros de campo intentados (FGA) estan muy correlacionados con los puntos, pero que el porcentaje de tiro de campo no lo esta.<br>Dos variables con correlacion negativa son 3PA (triples intentados) y OREB (rebotes ofensivos). Que tipo de correlacion ves entre estas dos variables?",
-                choices: ["A. correlacion positiva fuerte", "B. correlacion negativa fuerte", "C. correlacion positiva debil", "D. correlacion negativa debil", "E. no hay correlacion"],
+                text: "Por supuesto, las canastas anotadas (FGM) están muy correlacionadas con los puntos. También vemos que los tiros de campo intentados (FGA) están muy correlacionados con los puntos, pero que el porcentaje de tiro de campo no lo está.<br>Dos variables con correlación negativa son 3PA (triples intentados) y OREB (rebotes ofensivos). ¿Qué tipo de correlación ves entre estas dos variables?",
+                choices: ["A. Correlación positiva fuerte", "B. Correlación negativa fuerte", "C. Correlación positiva débil", "D. Correlación negativa débil", "E. no hay correlación"],
                 correct: "D",
                 code: "px.scatter(datos, x='3PA', y='OREB', trendline='ols', title='OREB frente a 3PA').update_traces(line={'color':'red'})",
                 code_output: "visualizacion3.html"
             },
             {
                 type: "short answer",
-                text: "En que ano anotaron Las Vegas Aces la mayor cantidad de puntos por jugadora?",
+                text: "¿En qué año anotaron Las Vegas Aces la mayor cantidad de puntos por jugadora?",
                 correct: "2021",
                 code: "equipo = 'Las Vegas Aces'<br>datos_filtrados = datos[datos['TEAM'] == equipo]<br>px.bar(datos_filtrados, x='SEASON', y='PTS', color='PLAYER', title=f'Puntos por jugadora de {equipo} por temporada')",
                 code_output: "visualizacion4.html"
