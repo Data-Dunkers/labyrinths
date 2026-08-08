@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mini laberinto de datos de baloncesto</title>
+    <title>Mini laberinto de Datos de Baloncesto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,7 +52,7 @@
 
 </head>
 <body>
-    <h1>Mini laberinto de datos de baloncesto</h1>
+    <h1>Mini laberinto de Datos de Baloncesto</h1>
     <div id="quiz-container">
         <div id="question"></div>
         <div id="answer_choices" style="text-align: left; padding-left: 20%;"></div>
@@ -296,21 +296,21 @@
             },
             {
                 type: "short answer",
-                text: "A continuacion veras datos sobre la puntuacion de jugadoras de la WNBA. Cual es la primera temporada (ano) para la que tenemos datos?",
+                text: "A continuación veras datos sobre la puntuación de jugadoras de la WNBA. ¿Cuál es la primera temporada (año) para la que tenemos datos?",
                 correct: "1997",
                 code: "datos = pd.read_csv('wnba-puntuacion-de-jugadoras-1997-2023.csv')<br>display(datos)", 
                 code_output: "datos-para-mostrar.html"
             },
             {
                 type: "short answer",
-                text: "Cuantos equipos de la WNBA hay en el conjunto de datos?",
+                text: "¿Cuántos equipos de la WNBA hay en el conjunto de datos?",
                 correct: "12",
                 code: "equipos = datos['TEAM'].unique()<br>display(equipos)<br>display(len(equipos))",
                 code_output: "array(['Atlanta Dream', 'Chicago Sky', 'Connecticut Sun', 'Dallas Wings', 'Indiana Fever', 'Las Vegas Aces', 'Los Angeles Sparks', 'Minnesota Lynx', 'New York Liberty', 'Phoenix Mercury', 'Seattle Storm', 'Washington Mystics'], dtype=object)<br>12"
             },
             {
                 type: "multiple choice",
-                text: "Vamos a crear una visualizacion de puntos frente a minutos jugados por partido.<br>Que tendencia observas en los datos?",
+                text: "Vamos a crear una visualización de puntos frente a minutos jugados por partido.<br>¿Que tendencia observas en los datos?",
                 choices: ["A. las jugadoras con mas minutos suelen anotar menos puntos", "B. las jugadoras con mas minutos suelen anotar mas puntos", "C. no parece haber correlacion entre minutos y puntos"],
                 correct: "B",
                 code: "px.scatter(datos, x='MIN', y='PTS', color='TEAM', title='Puntos frente a minutos jugados por partido', hover_data=['PLAYER', 'TEAM', 'SEASON'])",
@@ -318,14 +318,14 @@
             },
             {
                 type: "short answer",
-                text: "Hay bastantes otras columnas en el conjunto de datos.<br>Que columna contiene los porcentajes de tiros libres?",
+                text: "Hay bastantes otras columnas en el conjunto de datos.<br>¿Qué columna contiene los porcentajes de tiros libres?",
                 correct: "FT%",
                 code: "datos.columns",
                 code_output: "columnas-de-datos.html"
             },
             {
                 type: "multiple choice",
-                text: "Este codigo producira una visualizacion de matriz de correlacion.<br>Que columna esta mas fuertemente correlacionada con PTS (puntos)?",
+                text: "Este código producirá una visualización de matriz de correlación.<br>¿Qué columna está más fuertemente correlacionada con PTS (puntos)?",
                 choices: ["A. GP (partidos jugados)", "B. MIN (minutos jugados)", "C. FGM (canastas anotadas)", "D. FGA (tiros de campo intentados)", "E. FG% (porcentaje de tiro de campo)"],
                 correct: "C",
                 code: "px.imshow(datos.corr(numeric_only=True), height=800, text_auto='.3f', title='Matriz de correlacion de anotacion de la WNBA').update_coloraxes(showscale=False)",
